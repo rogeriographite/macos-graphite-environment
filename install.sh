@@ -35,10 +35,12 @@ cecho() {
   esac
 }
 
+brew install bash
+
 cecho 2 "#Instaling git  and creating document root                                                            "
     gitUsername=$1
     echo ""
-    brew install git -y
+    brew install git
     sudo mkdir -p /var/www/Graphite
     sudo chmod 777 -R /var/www
 
@@ -46,9 +48,9 @@ cecho 2 "#Cloning sh_web.git                                                    
     git clone git@github.com:$gitUsername/sh_web.git /var/www/Graphite
 
 cecho 2 "#Configuring workspace                                                                                "
-    mkdir -p /var/www/Graphite/assets
-    mkdir -p /var/www/Graphite/protected/runtime
-    sudo chown -R /var/www/Graphite
+    sudo mkdir -p /var/www/Graphite/assets
+    sudo mkdir -p /var/www/Graphite/protected/runtime
+    sudo chmod -R 777 /var/www/Graphite
 
 cecho 2 "#Installing binaries - ImageMagic PHP PECL  HTTPD MYSQL MEMCACHED                                     "
     brew install php@7.1
@@ -61,16 +63,22 @@ cecho 2 "#Installing binaries - ImageMagic PHP PECL  HTTPD MYSQL MEMCACHED      
     pecl=$(sudo find /usr/local -iname pecl 2>/dev/null -print | grep bin)
     alias pecl=$pecl
     pecl install imagick
-    pecl install igbinary imagick memcached xdebug
+    pecl install igbinary 
+    pecl install imagick 
+    brew install libmemcached
+    brew install zlib
+    pecl install memcache
+    
+    memcached xdebug
 
 cecho 2 "#Configuring phppool, php.ini and pecl                                                                "
     sed -i -e 's/upload_max_filesize = 50M/upload_max_filesize = 2M/g' /usr/local/etc/php/7.1/php.ini
     sed -i -e 's/max_file_uploads = 10/max_file_uploads = 20M/g' /usr/local/etc/php/7.1/php.ini
-    cp -frv event.conf /usr/local/etc/php/7.1/php-fpm.d/
-    cp -frv ext_opcache.ini /usr/local/etc/php/7.1/conf.d
-    cp -frv ext_memcached.ini /usr/local/etc/php/7.1/conf.d
-    cp -frv httpd.conf /usr/local/etc/httpd/httpd.conf
-    cp -frv graphite.conf /usr/local/etc/httpd
+    cp -frv conf/event.conf /usr/local/etc/php/7.1/php-fpm.d/
+    cp -frv conf/ext_opcache.ini /usr/local/etc/php/7.1/conf.d
+    cp -frv conf/ext_memcached.ini /usr/local/etc/php/7.1/conf.d
+    cp -frv conf/httpd.conf /usr/local/etc/httpd/httpd.conf
+    cp -frv conf/graphite.conf /usr/local/etc/httpd
 
 cecho 2 "#Starting Services                                                                                    "
     brew services start php@7.1
@@ -82,7 +90,10 @@ cecho 2 "#Configuring Mysql                                                     
     /usr/local/opt/mysql@5.7/bin/./mysql -u root < database.sql
 
 cecho 2 "#Installing dependencies with composer                                                                 "
-    curl -o /var/www/protected/libraries/composer.phar https://getcomposer.org/download/1.9.0/composer.pharcd 
+    curl -o /var/www/protected/libraries/composer.phar https://getcomposer.org/download/1.9.0/composer.phar 
     cd /var/www/protected/libraries/
     chmod +x composer.phar
     composer.phar install
+
+cecho 2 "#Configuring app-config-file                                                                           "
+    sudo cp /var/www/protected/config/shapp.example.yaml /etc/shapp.yaml
