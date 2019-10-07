@@ -96,4 +96,4 @@ cecho 2 "#Installing dependencies with composer                                 
     composer.phar install
 
 cecho 2 "#Configuring app-config-file                                                                           "
-    sudo cp /var/www/protected/config/shapp.example.yaml /etc/shapp.yaml
+    sudo cp /var/www/protected/config/graphite.example.yaml /etc/graphite.yaml
