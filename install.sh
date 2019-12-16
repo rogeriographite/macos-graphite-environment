@@ -97,3 +97,11 @@ cecho 2 "#Installing dependencies with composer                                 
 
 cecho 2 "#Configuring app-config-file                                                                           "
     sudo cp /var/www/protected/config/graphite.example.yaml /etc/graphite.yaml
+
+cecho 2 "#Configuring Database                                                                                  "
+     cd /var/www/protected/
+     ./yiic Util Run syncSchema 'loadBaseline'
+     ./yiic DataInit Run initAllData
+     ./yiic DataInit Run loadWorkCategories
+     ./yiic DataInit Run loadEducationInstitutionsBaseline
+     ./yiic DataInit Run loadEducationInstitutions gradSchools medicalSchools schoolsToAdd_1 schoolsToAdd_2
